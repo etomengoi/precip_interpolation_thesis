@@ -1,0 +1,64 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+This thesis built continuous $1$~km gridded daily precipitation
+fields over northern and central Germany from the ReKIS station
+network. Three families of estimator were implemented on a common
+preprocessing pipeline and evaluated on the same held-out subset of
+the network: Ordinary Kriging as the geostatistical baseline,
+gradient boosting as a flexible regressor over engineered covariates,
+and Bayesian Neural Fields as a probabilistic spatiotemporal model.
+
+The three objectives stated in Chapter~\ref{ch:introduction} were
+met as follows. The first objective, implementation and validation
+of Ordinary Kriging as a baseline, was fulfilled by the two-stage
+indicator-plus-amount pipeline of Chapter~\ref{ch:kriging}, whose
+leave-one-out cross-validation under MAE and CRPS established the
+geostatistical reference against which the remaining methods are
+measured. The second objective, assessment of terrain elevation
+as an auxiliary predictor, was addressed in the same chapter
+through the elevation-aware monthly normals built on the Copernicus
+DEM and confirmed that orographic information reduces the residual
+trend prior to spatial interpolation. The third objective,
+contextualisation against machine-learning alternatives, was met
+by the gradient boosting pipeline of Chapter~\ref{ch:gbm}
+and the Bayesian Neural Field of Chapter~\ref{ch:bayesnf}, both
+trained and validated on the same data splits as the geostatistical
+baseline; the cross-method comparison of Chapter~\ref{ch:comparison}
+quantified the trade-off between interpretability and predictive
+accuracy and provided the empirical basis for selecting the
+Bayesian Neural Field as the production model.
+
+The cross-method evaluation of Chapter~\ref{ch:comparison} confirmed
+that the Bayesian Neural Field attains the lowest holdout MAE and CRPS
+among the three methods and is the only one of them that returns a
+calibrated predictive distribution at every grid cell; gradient
+boosting placed between Ordinary Kriging and the Bayesian Neural Field
+on both metrics. The selected model was then materialised as a
+four-resolution gridded daily precipitation product for the worked
+example month and distributed as a Parquet dataset over the four
+nested target resolutions.
+
+Inspection of the resulting fields confirmed that the high-resolution
+Copernicus DEM and the SoilGrids covariates are a necessary input for
+resolving local rainfall: without elevation and soil information at
+$1$~km, the orographic and surface-controlled components of local
+rainfall collapse into the broad station-distance trend, and the
+progressive smoothing observed at coarser resolutions is the direct
+expression of this mechanism.
+
+Two limitations of the present work point to natural continuations.
+The \texttt{bayesnf} library exposes its model and its variational
+inference loop at a fairly low level, so that using the framework to
+its full strength requires fluent JAX and a working knowledge of
+variational inference and Bayesian model construction; at the present
+stage of the author's expertise this is the binding constraint on what
+Chapter~\ref{ch:bayesnf} could explore, and the hyperparameter sweep
+reported there should be read as a first pass over the configuration
+space rather than as a settled tuning. A more principled second round
+of model tuning, a deeper analysis of the covariate stack already
+introduced in Chapter~\ref{ch:bayesnf}, and a direct cross-check of
+the gridded product against established national gridded precipitation
+datasets would situate the present results among existing operational
+references and identify in which regimes and regions the proposed
+pipeline improves on or falls behind them.

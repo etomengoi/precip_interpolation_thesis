@@ -1,0 +1,99 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+High-resolution gridded precipitation data at 1~km resolution and below are
+a critical input for hydrological modelling, flood and drought prediction,
+climate impact assessment, and agricultural planning.
+Producing these grids from observations is difficult: meteorological station
+networks are sparse and spatially uneven, leaving large portions of any study
+domain without direct measurements.
+Converting discrete point observations into the continuous spatial fields
+that downstream models require is the central problem of spatial precipitation
+interpolation.
+
+Precipitation's statistical properties make standard interpolation methods
+inappropriate.
+Unlike temperature or pressure, which are continuous and approximately
+Gaussian, daily precipitation has a \textbf{mixed discrete-continuous} distribution.
+A large fraction of all station-days record exactly zero (dry days), producing
+a point mass at zero that cannot be represented by a single linear interpolator over a continuous field.
+In the Central European study domain used in this thesis, dry days predominate
+across the study period (overall dry-day fraction 51.9\%), though the proportion
+varies by season and location, making the zero-inflation problem unavoidable.
+Among wet days, precipitation amounts follow a heavy-tailed, right-skewed
+distribution, with rare but intense events contributing disproportionately to
+the total.
+
+Both properties rule out naive application of standard kriging — a geostatistical method that estimates values at unobserved locations as a weighted average of neighbouring stations, assuming a stationary random field.
+
+The core scientific problem addressed by this thesis is the transformation of
+discrete, point-level daily precipitation measurements into continuous,
+statistically coherent spatial fields at 1~km resolution over northern and
+central Germany
+(longitude $9.4^\circ$--$15.9^\circ$\,E, latitude $50.0^\circ$--$53.8^\circ$\,N,
+EPSG:3035).
+The study domain is served by the ReKIS regional climate network, comprising
+2{,}458 stations with daily records spanning 1961--2023.
+
+Three properties of the daily precipitation distribution require explicit treatment.
+First, the \textbf{zero} inflation must be handled through either a two-stage model
+that separates occurrence from amounts, or a unified framework that accommodates
+the mixed distribution directly.
+Second, the \textbf{non-stationarity of the mean}, caused by both the seasonal
+cycle and orographic forcing, violates the stationarity assumption of standard
+kriging (see Chapter~\ref{ch:theory}) and must be removed before spatial correlation can be modelled.
+Third, the \textbf{right-skewness} of wet-day amounts requires a
+variance-stabilising transformation if the kriging uncertainty estimates are
+to be physically meaningful.
+
+This thesis has three objectives:
+
+\begin{enumerate}
+    \item \textbf{Implement and validate Ordinary Kriging as a baseline.}
+    A complete preprocessing and interpolation pipeline is developed to handle
+    the statistical properties of daily precipitation that standard kriging
+    cannot address directly.
+    The pipeline is evaluated by cross-validation using a proper scoring
+    rule that assesses both point accuracy and uncertainty calibration.
+
+    \item \textbf{Assess the role of terrain elevation as an auxiliary predictor.}
+    Elevation data from the Copernicus Digital Elevation Model are incorporated
+    into the interpolation of climatological monthly normals.
+    Cross-validation quantifies whether the orographic precipitation gradient
+    in the study domain can be captured and whether doing so reduces
+    interpolation error.
+
+    \item \textbf{Contextualise results relative to machine learning alternatives.}
+    Gradient boosting and Bayesian neural field approaches are implemented
+    and compared as non-geostatistical alternatives.
+    The geostatistical approach is the interpretable, physically motivated
+    baseline; gradient boosting and the neural field model test whether
+    data-driven flexibility improves on it.
+\end{enumerate}
+
+\textbf{Chapter~2} reviews the theoretical background of the three methods examined in this thesis.
+
+\textbf{Chapter~3} describes the study domain and its data sources.
+
+\textbf{Chapter~4} presents the implementation of the Ordinary Kriging pipeline.
+
+\textbf{Chapter~5} presents the gradient boosting implementation for
+spatial precipitation interpolation, including feature construction and
+hyperparameter selection.
+
+\textbf{Chapter~6} presents the Bayesian Neural Field implementation
+applied to the same interpolation task.
+
+\textbf{Chapter~7} compares the three methods on common evaluation metrics,
+examines the gridded outputs, and discusses the trade-offs between
+geostatistical interpretability and data-driven flexibility.
+
+\textbf{Chapter~8} summarises the main findings and outlines directions for
+future work.
+
+\bigskip
+\noindent\textbf{Code and data availability.}
+The complete codebase developed for this thesis — preprocessing
+pipelines, the three interpolation models, evaluation notebooks and
+the scripts that build the gridded product — is publicly available in
+the project's GitHub repository~\cite{thesisRepo}.

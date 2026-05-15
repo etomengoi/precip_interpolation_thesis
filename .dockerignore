@@ -1,0 +1,28 @@
+# Data and outputs — stored on S3, synced at runtime by entrypoint.sh
+data/
+outputs/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Notebooks and dev artifacts
+notebooks/
+*.ipynb
+
+# IDE / OS
+.venv/
+.env
+.git/
+.gitignore
+*.md
+*.log
+sed
+vastai
+vastai.pub

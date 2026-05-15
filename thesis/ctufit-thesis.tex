@@ -1,0 +1,273 @@
+% !TEX root = ctufit-thesis.tex
+% !TEX program = xelatex
+%% This is the ctufit-thesis example file. It is used to produce theses
+%% for submission to Czech Technical University, Faculty of Information Technology.
+%%
+%% This is version 1.6.0, built 18. 9. 2025.
+%%
+%% Get the newest version from
+%% https://gitlab.fit.cvut.cz/theses-templates/FITthesis-LaTeX
+%%
+%%
+%% Copyright 2024, Tomas Novacek
+%% Copyright 2021, Eliska Sestakova and Ondrej Guth
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%  https://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%%
+%% The current maintainer of this work is Tomas Novacek (novacto3@fit.cvut.cz).
+%% Alternatively, submit bug reports to the tracker at
+%% https://gitlab.fit.cvut.cz/theses-templates/FITthesis-LaTeX/issues
+%%
+%%
+
+% arara: xelatex
+% arara: biber
+% arara: xelatex
+% arara: xelatex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CLASS OPTIONS
+% language: czech/english/slovak
+% thesis type: bachelor/master/dissertation/doctoral-report
+% electronic (oneside) or printed (twoside), twoside is default
+% paragraph - if passed, this optional argument sets paragraphs as the deepest level of headers, styles it, numbers it and adds it to Table of Content. Use with care! Normally, it is considered unwise to use it, since it is too deep.
+% colour: bw for black&white OR no option for default colour scheme
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[english,bachelor,oneside]{ctufit-thesis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FILL IN THIS INFORMATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ctufittitle{Spatiotemporal interpolation of precipitation and machine learning}
+\ctufitauthorfull{Tamerlan Ismakatov} % replace with your full name (first name(s) and then family name(s) / surname(s)) including academic degrees
+\ctufitauthorsurnames{Ismakatov} % replace with your surname(s) / family name(s)
+\ctufitauthorgivennames{Tamerlan} % replace with your first name(s) / given name(s)
+\ctufitsupervisor{Ing. Ondřej Podsztavek, Ph.D} % replace with name of your supervisor/advisor (include academic degrees)
+\ctufitdepartment{Applied Mathematics} % replace with the department of your defence
+\ctufitprogram{Informatics} % replace with your study program
+\ctufitspecialisation{Artificial Intelligence} % replace with your specialisation
+\ctufityear{2026} % replace with the year of your defence
+\ctufitdeclarationplace{Prague} % replace with the place where you sign the declaration
+\ctufitdeclarationdate{\today} % replace with the date of signature of the declaration
+\ctufitabstractCZE{Tato práce se zabývá vytvořením vysoce rozlišeného pozorovacího mřížkového datového souboru pro denní srážky s prostorovým rozlišením 1 km nebo méně pomocí metod strojového učení. Práce porovnává tři přístupy: základní geostatistickou metodu (ordinary kriging), metodu strojového učení založenou na gradient boostingu (LightGBM) a pokročilou metodu (Bayesian Neural Fields). Cílem je překlenout mezeru mezi klimatickými modely nízkého rozlišení a potřebou lokálních dat pro praktické aplikace. Modely jsou hodnoceny na 492 vyčleněných stanicích pomocí střední absolutní chyby a CRPS. Bayesian Neural Fields dosahují nejnižší chyby na obou metrikách (MAE 0,347 mm, CRPS 0,286 mm), gradient boosting se umisťuje mezi nimi a ordinary kriging tvoří interpretovatelnou základní linii. Finálním výstupem je gridovaný produkt pro březen 2023 ve čtyřech vnořených rozlišeních (1, 2, 5 a 10 km).}
+\ctufitabstractENG{This thesis focuses on creating a high-resolution observational gridded dataset for daily precipitation with spatial resolution of 1 km or less using machine learning methods. The work compares three approaches: a geostatistical baseline (ordinary kriging), a gradient-boosting machine learning method (LightGBM), and a state-of-the-art Bayesian Neural Field model. The goal is to bridge the gap between low-resolution climate models and the need for local data for practical applications. The three methods are evaluated on 492 held-out stations using mean absolute error and the continuous ranked probability score. Bayesian Neural Fields attain the lowest error on both metrics (MAE $0.347$~mm, CRPS $0.286$~mm), gradient boosting ranks second, and ordinary kriging serves as the interpretable baseline. The final deliverable is a gridded product for March 2023 released at four nested resolutions (1, 2, 5 and 10~km).}
+\ctufitkeywordsCZE{denní srážky, datový soubor, prostorová interpolace, strojové učení, kriging, LightGBM, Bayesian Neural Fields, klimatická data}
+\ctufitkeywordsENG{daily precipitation, dataset, spatial interpolation, machine learning, kriging, LightGBM, Bayesian Neural Fields, climate data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% END FILL IN
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOMIZATION of this template
+% Skip this part or alter it if you know what you are doing.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage{iftex}[2020/03/06]
+\iftutex % XeLaTeX and LuaLaTeX
+    \RequirePackage{ellipsis}[2020/05/22] %ellipsis workaround for XeLaTeX
+\else
+    \errmessage{Only compilation with XeLaTeX or LuaLaTeX is allowed}
+    \stop
+\fi
+
+% hyperlinks
+\hypersetup{
+    pdfpagelayout=TwoPageRight,
+    colorlinks=false,
+    allcolors=decoration,
+    pdfborder={0 0 0.1}
+}
+
+% uncomment the following to hide all hyperlinks
+%\hypersetup{hidelinks}
+
+% uncomment the following to change the colour of all hyperlinks to CTU blue
+%\hypersetup{allbordercolors=decoration}
+
+\RequirePackage{pdfpages}[2020/01/28]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOMIZATION of this template END
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES SETTINGS
+% You may choose to modify this part.
+%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{dirtree}
+\usepackage{lipsum,tikz}
+\usepackage[style=iso-numeric]{biblatex}
+\addbibresource{bib-database.bib}
+\usepackage{xurl}
+\usepackage{listings} % typesetting of sources
+\usepackage{booktabs} % \toprule, \midrule, \bottomrule in tables
+%\usepackage{minted}
+\usepackage{csquotes}
+\usepackage{float}    % \begin{figure}[H]
+\DeclareMathOperator*{\argmin}{arg\,min}
+\graphicspath{{text/}}
+
+%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES SETTINGS END
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\frontmatter\frontmatterinit % do not remove these two commands
+
+\thispagestyle{empty}\maketitle\thispagestyle{empty}\cleardoublepage % do not remove these four commands
+
+\includepdf[pages={1-}]{ismaktam-assignment.pdf} % replace this file with your thesis assignment generated from ProjectsFIT
+
+\imprintpage % do not remove this command
+\stopTOCentries
+
+%%%%%%%%%%%%%%%%%%%
+% ACKNOWLEDGMENT
+% FILL IN / MODIFY
+% This is a place to thank people for helping you. It is common to thank your supervisor.
+%%%%%%%%%%%%%%%%%%%
+\begin{acknowledgmentpage}
+      I would like to express my sincere gratitude to my supervisor,
+      Ing.\,Ondřej Podsztavek, Ph.D., for his guidance, patience, and
+      constructive feedback throughout the preparation of this thesis.
+      I am also deeply grateful to my family for their continuous
+      support and encouragement during my studies, and to my friends,
+      whose company made this journey enjoyable.
+  \end{acknowledgmentpage}
+%%%%%%%%%%%%%%%%%%%
+% ACKNOWLEDGMENT END
+%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%
+% DECLARATION
+% FILL IN / MODIFY
+%%%%%%%%%%%%%%%%%%%
+% INSTRUCTIONS
+% ENG: choose one of approved texts of the declaration. DO NOT CREATE YOUR OWN. Find the approved texts at https://courses.fit.cvut.cz/SFE/download/index.html#_documents (document Declaration for FT in English)
+% CZE/SLO: Vyberte jedno z fakultou schvalenych prohlaseni. NEVKLADEJTE VLASTNI TEXT. Schvalena prohlaseni najdete zde: https://courses.fit.cvut.cz/SZZ/dokumenty/index.html#_dokumenty (prohlášení do ZP)
+\begin{declarationpage}
+    I hereby declare that the presented thesis is my own work and that I have cited all sources of
+information in accordance with the Guideline for adhering to ethical principles when elaborating an
+academic final thesis.
+I acknowledge that my thesis is subject to the rights and obligations stipulated by the Act No.
+121/2000 Coll., the Copyright Act, as amended. In accordance with Section 2373(2) of Act No.
+89/2012 Coll., the Civil Code, as amended, I hereby grant a non-exclusive authorization (licence) to
+utilize this thesis, including all computer programs that are part of it or attached to it and all
+documentation thereof (hereinafter collectively referred to as the "Work"), to any and all persons
+who wish to use the Work. Such persons are entitled to use the Work in any manner that does not
+diminish the value of the Work and for any purpose (including use for profit). This authorisation is
+unlimited in time, territory and quantity.
+
+    I declare that I have used AI tools during the preparation and writing of my thesis. I have verified
+the generated content. I confirm that I am aware that I am fully responsible for the content of the
+thesis.
+\end{declarationpage}
+%%%%%%%%%%%%%%%%%%%
+% DECLARATION END
+%%%%%%%%%%%%%%%%%%%
+
+% Use one of the two following commands. The first prints abstracts+keywords on two pages, the second puts them on one page (if possible). \printonepageabstract can also accept optional argument that specifies a vertical space before both abstracts (the default is 18 mm).
+%\printtwopageabstract
+\printonepageabstract
+
+%%%%%%%%%%%%%%%%%%%
+% SUMMARY
+% FILL IN / MODIFY
+% OR REMOVE ENTIRELY (upon agreement with your supervisor)
+% (appropriate to remove in most theses)
+%%%%%%%%%%%%%%%%%%%
+% \begin{summarypage}
+% \section*{Summary section}
+%
+% \lipsum[1][1-8]
+%
+% \section*{Summary section}
+%
+% \lipsum[2][1-6]
+%
+% \section*{Summary section}
+%
+% \lipsum[3]
+%
+% \section*{Summary section}
+%
+% \lipsum[2]
+%
+% \section*{Summary section}
+%
+% \lipsum[1][1-8] Lorem lorem lorem.
+% \end{summarypage}
+%%%%%%%%%%%%%%%%%%%
+% SUMMARY END
+%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents % do not remove this command
+%%%%%%%%%%%%%%%%%%%%%%
+% list of other contents: figures, tables, code listings, algorithms, etc.
+% add/remove commands accordingly
+%%%%%%%%%%%%%%%%%%%%%%
+\listoffigures % list of figures
+\begingroup
+\let\clearpage\relax
+\listoftables % list of tables. Remove if you do not have any.
+\thectufitlistingscommand{} % list of code listings. Remove if you do not have any.
+\thectufitlistofalgorithmscommand{} % list of algorithm pseudocodes defined using the algorithm package.
+\endgroup
+%%%%%%%%%%%%%%%%%%%%%%
+% list of other contents END
+%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%
+% ABBREVIATIONS
+% FILL IN / MODIFY
+% OR REMOVE ENTIRELY
+% List the abbreviations in lexicography order.
+%%%%%%%%%%%%%%%%%%%
+\chapter{\thectufitabbreviationlabel}
+
+\begin{tabular}{rl}
+	DFA   & Deterministic Finite Automaton                 \\
+	FA    & Finite Automaton                               \\
+	LPS   & Labelled Prüfer Sequence                       \\
+	NFA   & Nondeterministic Finite Automaton              \\
+	NPS   & Numbered Prüfer Sequence                       \\
+	XML   & Extensible Markup Language                     \\
+	XPath & XML Path Language                              \\
+	XSLT  & eXtensible Stylesheet Language Transformations \\
+	W3C   & World Wide Web Consortium
+\end{tabular}
+%%%%%%%%%%%%%%%%%%%
+% ABBREVIATIONS END
+%%%%%%%%%%%%%%%%%%%
+\resumeTOCentries
+\mainmatter\mainmatterinit % do not remove these two commands
+%%%%%%%%%%%%%%%%%%%
+% THE THESIS
+% MODIFY ANYTHING BELOW THIS LINE
+%%%%%%%%%%%%%%%%%%%
+
+\include{text} % include `text.tex'
+
+\appendix\appendixinit % do not remove these two commands
+
+\include{appendix} % include `appendix.tex'
+
+\backmatter % do not remove this command
+
+\begin{sloppypar}
+\printbibliography % print out the BibLaTeX-generated bibliography list
+\end{sloppypar}
+
+\include{medium} % include `medium.tex'
+
+\end{document}
